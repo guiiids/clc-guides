@@ -57,6 +57,29 @@ elif [ ! -e "public/uploads" ]; then
   ln -s "$UPLOADS_DIR" public/uploads
 fi
 
+# ─── One-time content import ──────────────────────────────────────────────────
+# If /home/data/guide_content.json exists, import content into all guides
+# then delete the file so it only runs once.
+
+CONTENT_FILE="$DATA_DIR/guide_content.json"
+if [ -f "$CONTENT_FILE" ]; then
+  echo "→ Found guide_content.json — importing content..."
+  node -e "
+const { PrismaClient } = require('@prisma/client');
+const fs = require('fs');
+const p = new PrismaClient();
+const guides = JSON.parse(fs.readFileSync('$CONTENT_FILE', 'utf8'));
+Promise.all(
+  guides.map(g => p.guide.update({ where: { slug: g.slug }, data: { content: g.content, status: 'published' } }))
+).then(r => {
+  console.log('  Imported content for', r.length, 'guides');
+  return p.\$disconnect();
+}).catch(e => { console.error(e); return p.\$disconnect(); });
+"
+  rm -f "$CONTENT_FILE"
+  echo "→ Import complete, trigger file removed."
+fi
+
 # ─── Start Next.js ─────────────────────────────────────────────────────────────
 echo "→ Starting server on port ${PORT:-3000}..."
 exec node server.js
