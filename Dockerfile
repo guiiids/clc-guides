@@ -1,9 +1,7 @@
 # ─── Stage 1: Install all dependencies ────────────────────────────────────────
-FROM node:20-alpine AS deps
+# node:20-slim is Debian-based and ships with OpenSSL 3 — no musl/openssl issues
+FROM node:20-slim AS deps
 WORKDIR /app
-
-# openssl is required by the Prisma query engine (linux-musl-openssl-3.0.x)
-RUN apk add --no-cache openssl
 
 COPY package*.json ./
 COPY prisma ./prisma/
@@ -11,15 +9,13 @@ COPY prisma ./prisma/
 RUN npm install
 
 # ─── Stage 2: Build ────────────────────────────────────────────────────────────
-FROM node:20-alpine AS builder
+FROM node:20-slim AS builder
 WORKDIR /app
-
-RUN apk add --no-cache openssl
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Generate Prisma client (uses linux-musl-openssl-3.0.x binary target)
+# Generate Prisma client for the linux-debian-openssl-3.0.x runtime
 RUN npx prisma generate
 
 # Create a temporary SQLite database so Next.js can prerender pages at build
@@ -30,11 +26,8 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
 # ─── Stage 3: Production runner ────────────────────────────────────────────────
-FROM node:20-alpine AS runner
+FROM node:20-slim AS runner
 WORKDIR /app
-
-# Same openssl version required by the Prisma engine at runtime
-RUN apk add --no-cache openssl
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
