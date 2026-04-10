@@ -2,6 +2,9 @@
 FROM node:20-alpine AS deps
 WORKDIR /app
 
+# openssl is required by the Prisma query engine (linux-musl-openssl-3.0.x)
+RUN apk add --no-cache openssl
+
 COPY package*.json ./
 COPY prisma ./prisma/
 
@@ -11,11 +14,17 @@ RUN npm install
 FROM node:20-alpine AS builder
 WORKDIR /app
 
+RUN apk add --no-cache openssl
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Generate Prisma client before building
+# Generate Prisma client (uses linux-musl-openssl-3.0.x binary target)
 RUN npx prisma generate
+
+# Create a temporary SQLite database so Next.js can prerender pages at build
+# time (the root page queries the DB). This DB is discarded after the build.
+RUN npx prisma db push --skip-generate
 
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
@@ -24,19 +33,19 @@ RUN npm run build
 FROM node:20-alpine AS runner
 WORKDIR /app
 
+# Same openssl version required by the Prisma engine at runtime
+RUN apk add --no-cache openssl
+
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
 # ── Next.js standalone output ──────────────────────────────────────────────────
-# server.js + traced node_modules (minimal set for the app itself)
 COPY --from=builder /app/.next/standalone ./
-# Static assets served by Next.js
 COPY --from=builder /app/.next/static ./.next/static
-# Public folder (favicon, etc.)
 COPY --from=builder /app/public ./public
 
 # ── Prisma CLI + client for startup-time schema push & seeding ─────────────────
-# These are NOT included in the standalone trace — we need them for startup only.
+# These are not included in the standalone trace — needed for startup.sh only.
 COPY --from=builder /app/node_modules/.bin/prisma          ./node_modules/.bin/prisma
 COPY --from=builder /app/node_modules/prisma               ./node_modules/prisma
 COPY --from=builder /app/node_modules/@prisma              ./node_modules/@prisma
@@ -46,15 +55,14 @@ COPY --from=builder /app/node_modules/.prisma              ./node_modules/.prism
 COPY --from=builder /app/node_modules/bcryptjs             ./node_modules/bcryptjs
 
 # Prisma schema (needed by CLI at runtime) and seed script
-COPY --from=builder /app/prisma    ./prisma
+COPY --from=builder /app/prisma       ./prisma
 COPY --from=builder /app/package.json ./package.json
 
 # ── Entrypoint ─────────────────────────────────────────────────────────────────
 COPY startup.sh ./startup.sh
 RUN chmod +x ./startup.sh
 
-# Azure App Services expects the container to listen on this port.
-# Set WEBSITES_PORT=3000 in your Azure App Service Configuration → App Settings.
+# Azure App Services: set WEBSITES_PORT=3000 in App Settings.
 EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
