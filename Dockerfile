@@ -43,15 +43,11 @@ COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
 
-# ── Prisma CLI + client for startup-time schema push & seeding ─────────────────
-# These are not included in the standalone trace — needed for startup.sh only.
-COPY --from=builder /app/node_modules/.bin/prisma          ./node_modules/.bin/prisma
-COPY --from=builder /app/node_modules/prisma               ./node_modules/prisma
-COPY --from=builder /app/node_modules/@prisma              ./node_modules/@prisma
-COPY --from=builder /app/node_modules/.prisma              ./node_modules/.prisma
-
-# bcryptjs is used by the seed script
-COPY --from=builder /app/node_modules/bcryptjs             ./node_modules/bcryptjs
+# ── Full node_modules for startup.sh (prisma CLI, seed script, etc.) ──────────
+# Cherry-picking individual packages breaks because .bin/prisma is a symlink
+# that Docker dereferences — the WASM sibling files end up in the wrong place.
+# Copying the whole tree is simpler and reliable.
+COPY --from=builder /app/node_modules ./node_modules
 
 # Prisma schema (needed by CLI at runtime) and seed script
 COPY --from=builder /app/prisma       ./prisma
