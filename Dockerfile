@@ -1,7 +1,8 @@
 # ─── Stage 1: Install all dependencies ────────────────────────────────────────
-# node:20-slim is Debian-based and ships with OpenSSL 3 — no musl/openssl issues
 FROM node:20-slim AS deps
 WORKDIR /app
+
+RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 
 COPY package*.json ./
 COPY prisma ./prisma/
@@ -12,6 +13,8 @@ RUN npm install
 FROM node:20-slim AS builder
 WORKDIR /app
 
+RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
@@ -20,14 +23,17 @@ RUN npx prisma generate
 
 # Create a temporary SQLite database so Next.js can prerender pages at build
 # time (the root page queries the DB). This DB is discarded after the build.
-RUN npx prisma db push --skip-generate
+RUN DATABASE_URL="file:/tmp/build.db" npx prisma db push --skip-generate
 
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV DATABASE_URL="file:/tmp/build.db"
 RUN npm run build
 
 # ─── Stage 3: Production runner ────────────────────────────────────────────────
 FROM node:20-slim AS runner
 WORKDIR /app
+
+RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
