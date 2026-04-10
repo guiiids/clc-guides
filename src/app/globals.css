@@ -1,0 +1,132 @@
+@import "tailwindcss";
+
+/* ── Agilent CrossLab Connect design tokens ─────────────────────── */
+:root {
+  --primary-blue: #0085d5;
+  --dark-blue: #00426a;
+  --medium-blue: #2281c4;
+  --white: #ffffff;
+  --dark-gray: #202020;
+  --medium-gray: #888b8d;
+  --light-gray: #f4f3f1;
+  --lighter-gray: #efefef;
+
+  /* Sidebar dims */
+  --sidebar-width: 300px;
+  --header-height: 120px;
+}
+
+/* ── Global resets ───────────────────────────────────────────────── */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Roboto', Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--dark-gray);
+  background: var(--lighter-gray);
+}
+
+/* ── Public guide content prose styles ──────────────────────────── */
+/* h1 inside content is redundant (section-card header shows the guide title) */
+.guide-prose h1 { display: none; }
+.guide-prose h2 {
+  font-size: 20px; color: var(--primary-blue);
+  border-bottom: 1px solid var(--lighter-gray);
+  padding-bottom: 8px; margin-top: 32px; margin-bottom: 16px; font-weight: 400;
+  /* offset for sticky header so anchor links land correctly */
+  scroll-margin-top: calc(var(--header-height) + 24px);
+}
+.guide-prose h3 {
+  font-size: 16px; margin-top: 24px; margin-bottom: 12px;
+  color: var(--primary-blue); font-weight: 500;
+  scroll-margin-top: calc(var(--header-height) + 24px);
+}
+.guide-prose p  { margin-bottom: 15px; }
+.guide-prose a  { color: var(--primary-blue); text-decoration: none; }
+.guide-prose a:hover { text-decoration: underline; }
+.guide-prose ul, .guide-prose ol { margin: 0 0 15px 25px; }
+.guide-prose li { margin-bottom: 6px; }
+.guide-prose strong { font-weight: 600; }
+.guide-prose code {
+  background: var(--lighter-gray); border-radius: 3px;
+  padding: 1px 5px; font-size: 13px; font-family: 'Courier New', monospace;
+}
+.guide-prose pre {
+  background: #1e293b; color: #e2e8f0; border-radius: 4px;
+  padding: 16px; overflow-x: auto; margin-bottom: 15px;
+}
+.guide-prose pre code { background: none; padding: 0; color: inherit; }
+.guide-prose table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+.guide-prose th {
+  background: var(--light-gray); padding: 10px 15px;
+  border: 1px solid #ddd; text-align: left; font-weight: 500; font-size: 13px;
+}
+.guide-prose td { padding: 8px 15px; border: 1px solid #ddd; font-size: 13px; }
+.guide-prose tr:nth-child(even) td { background: #fafafa; }
+.guide-prose figure { margin: 20px 0; text-align: center; }
+.guide-prose figure img {
+  max-width: 50%; height: auto; border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0,0,0,.15);
+  display: block; margin: 0 auto;
+}
+/* plain <img> tags (not in figure) */
+.guide-prose img:not(figure img) {
+  max-width: 50%; height: auto; border-radius: 4px;
+  display: block; margin: 16px auto;
+}
+.guide-prose figcaption { font-size: 12px; color: var(--medium-gray); margin-top: 8px; font-style: italic; }
+.guide-prose blockquote {
+  border-left: 3px solid var(--primary-blue); margin: 15px 0;
+  padding: 8px 16px; color: #555; background: #f8faff;
+}
+.guide-prose hr { border: none; border-top: 1px solid var(--lighter-gray); margin: 24px 0; }
+
+/* ── TipTap editor prose (admin) ────────────────────────────────── */
+.tiptap-editor .ProseMirror {
+  outline: none;
+  min-height: 400px;
+  padding: 32px 40px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: #0f172a;
+}
+.tiptap-editor .ProseMirror h1 { font-size: 24px; font-weight: 700; margin: 0 0 12px; }
+.tiptap-editor .ProseMirror h2 { font-size: 20px; font-weight: 600; margin: 24px 0 10px; color: #1e40af; }
+.tiptap-editor .ProseMirror h3 { font-size: 17px; font-weight: 600; margin: 20px 0 8px; color: #1e40af; }
+.tiptap-editor .ProseMirror p  { margin-bottom: 10px; }
+.tiptap-editor .ProseMirror ul, .tiptap-editor .ProseMirror ol { margin: 0 0 10px 24px; }
+.tiptap-editor .ProseMirror li { margin-bottom: 4px; }
+.tiptap-editor .ProseMirror blockquote {
+  border-left: 3px solid #2563eb; padding: 8px 16px;
+  margin: 12px 0; color: #475569; background: #f8faff;
+}
+.tiptap-editor .ProseMirror code {
+  background: #f1f5f9; border-radius: 3px; padding: 1px 5px; font-size: 13px;
+}
+.tiptap-editor .ProseMirror pre {
+  background: #1e293b; color: #e2e8f0; border-radius: 6px;
+  padding: 16px; overflow-x: auto; margin-bottom: 12px;
+}
+.tiptap-editor .ProseMirror pre code { background: none; padding: 0; color: inherit; }
+.tiptap-editor .ProseMirror table { border-collapse: collapse; width: 100%; margin-bottom: 12px; }
+.tiptap-editor .ProseMirror th, .tiptap-editor .ProseMirror td {
+  border: 1px solid #e2e8f0; padding: 8px 12px; text-align: left;
+}
+.tiptap-editor .ProseMirror th { background: #f8fafc; font-weight: 600; }
+.tiptap-editor .ProseMirror img { max-width: 100%; border-radius: 6px; margin: 8px 0; }
+.tiptap-editor .ProseMirror hr { border: none; border-top: 1px solid #e2e8f0; margin: 20px 0; }
+.tiptap-editor .ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left; color: #94a3b8; pointer-events: none; height: 0;
+}
+
+/* Task list */
+.tiptap-editor .ProseMirror ul[data-type="taskList"] { list-style: none; margin-left: 0; }
+.tiptap-editor .ProseMirror ul[data-type="taskList"] li { display: flex; align-items: flex-start; gap: 8px; }
+.tiptap-editor .ProseMirror ul[data-type="taskList"] li input[type="checkbox"] { margin-top: 3px; }
+
+/* Scrollbar for admin sidebar */
+.sidebar-scroll::-webkit-scrollbar { width: 4px; }
+.sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+.sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }

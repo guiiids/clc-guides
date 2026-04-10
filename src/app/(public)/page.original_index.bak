@@ -1,0 +1,21 @@
+import { redirect } from 'next/navigation'
+import { prisma } from '@/lib/db'
+
+export default async function HomePage() {
+  const first = await prisma.guide.findFirst({
+    where: { status: 'published' },
+    orderBy: { order: 'asc' },
+    select: { slug: true },
+  })
+
+  if (first) redirect(`/${first.slug}`)
+
+  return (
+    <div style={{ padding: '60px 0', textAlign: 'center', color: 'var(--medium-gray)' }}>
+      <p style={{ fontSize: 18 }}>No published guides yet.</p>
+      <p style={{ fontSize: 14, marginTop: 8 }}>
+        Go to <a href="/admin" style={{ color: 'var(--primary-blue)' }}>/admin</a> to publish your first guide.
+      </p>
+    </div>
+  )
+}

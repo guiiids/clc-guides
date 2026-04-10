@@ -1,0 +1,28 @@
+# Dependencies (reinstalled inside the build)
+node_modules
+
+# Next.js build output (built inside Docker)
+.next
+
+# Local env files — set these as App Settings in Azure, never bake them in
+.env
+.env.*
+!.env.example
+
+# SQLite databases (DB lives on /home in Azure, not in the image)
+*.db
+*.db-journal
+prisma/dev.db
+
+# Dev / OS noise
+.DS_Store
+*.log
+npm-debug.log*
+
+# Git
+.git
+.gitignore
+
+# Editor config
+.vscode
+.idea

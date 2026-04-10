@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ─── To switch to PostgreSQL for production ──────────────────────────────────
+// 1. Change provider to "postgresql"
+// 2. Update DATABASE_URL in .env to your PostgreSQL connection string
+// 3. Run: npx prisma migrate deploy
+// ─────────────────────────────────────────────────────────────────────────────
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Guide {
+  id             Int      @id @default(autoincrement())
+  slug           String   @unique
+  title          String
+  shortTitle     String
+  category       String   @default("Guides")
+  icon           String   @default("ph-file-pdf")
+  order          Int      @default(999)
+  status         String   @default("draft")   // "draft" | "published" | "archived"
+  content        String   @default("")         // TipTap HTML output
+  seoTitle       String   @default("")
+  seoDescription String   @default("")
+  tags           String   @default("")         // comma-separated
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model AdminUser {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password_hash String?
+  name          String?
+  role          String    @default("Editor")   // "Admin" | "Developer" | "Editor"
+  createdAt     DateTime  @default(now())
+  lastLogin     DateTime?
+}
