@@ -77,7 +77,7 @@ async function main() {
     await prisma.guide.upsert({
       where: { slug: guide.slug },
       update: {},   // don't overwrite content if already edited
-      create: { ...guide, status: 'draft', content: '', seoTitle: '', seoDescription: '', tags: '' },
+      create: { ...guide, status: 'published', content: '', seoTitle: '', seoDescription: '', tags: '' },
     })
     console.log(`  ✓ ${guide.slug}`)
   }
