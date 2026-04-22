@@ -40,7 +40,29 @@ if [ "$GUIDE_COUNT" = "0" ]; then
   echo "→ Fresh database detected — seeding..."
   node prisma/seed.js
 else
-  echo "→ Database already seeded ($GUIDE_COUNT guides found), skipping."
+  echo "→ Database already seeded ($GUIDE_COUNT guides found), skipping guide seed."
+fi
+
+# Always re-sync admin user from env vars so SEED_ADMIN_PASSWORD can be rotated
+# without dropping the database. Runs on every boot.
+if [ -n "$SEED_ADMIN_EMAIL" ] && [ -n "$SEED_ADMIN_PASSWORD" ]; then
+  echo "→ Syncing admin user from env..."
+  node -e "
+const { PrismaClient } = require('@prisma/client');
+const bcrypt = require('bcryptjs');
+const p = new PrismaClient();
+(async () => {
+  const email = process.env.SEED_ADMIN_EMAIL;
+  const hash = await bcrypt.hash(process.env.SEED_ADMIN_PASSWORD, 12);
+  await p.adminUser.upsert({
+    where: { email },
+    update: { password_hash: hash },
+    create: { email, password_hash: hash, name: 'Admin', role: 'Admin' },
+  });
+  console.log('  ✓ admin synced:', email);
+  await p.\$disconnect();
+})().catch(e => { console.error(e); process.exit(1); });
+"
 fi
 
 # ─── Persistent uploads ────────────────────────────────────────────────────────
