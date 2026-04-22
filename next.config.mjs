@@ -8,11 +8,7 @@ const nextConfig = {
         headers: [
           {
             key: 'Content-Security-Policy',
-            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:;"
-          },
-          {
-            key: 'X-Frame-Options',
-            value: 'DENY'
+            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; frame-ancestors 'self' https://*.sharepoint.com https://teams.microsoft.com https://*.teams.microsoft.com https://community.agilent.com https://nextgen-community.agilent.com;"
           },
           {
             key: 'X-Content-Type-Options',
