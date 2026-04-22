@@ -34,6 +34,6 @@ export default function RootLayout({ children }) {
         {children}
         <DevTypographyToggle />
       </body>
-    </html>.  
+    </html>
   )
 }
