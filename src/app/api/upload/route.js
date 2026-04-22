@@ -15,12 +15,18 @@ export async function POST(req) {
     return Response.json({ error: 'No file provided' }, { status: 400 })
   }
 
-  const allowed = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']
+  const allowed = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
   if (!allowed.includes(file.type)) {
     return Response.json({ error: 'File type not allowed' }, { status: 415 })
   }
 
-  const ext = extname(file.name) || '.png'
+  const MIME_TO_EXT = {
+    'image/jpeg': '.jpg',
+    'image/png': '.png',
+    'image/gif': '.gif',
+    'image/webp': '.webp'
+  }
+  const ext = MIME_TO_EXT[file.type] || '.png'
   const filename = `${randomUUID()}${ext}`
   const uploadsDir = join(process.cwd(), 'public', 'uploads')
 

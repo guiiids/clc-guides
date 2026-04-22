@@ -2,9 +2,13 @@
 
 /* ── Agilent CrossLab Connect design tokens ─────────────────────── */
 :root {
+  /* Primary palette */
+  --agilent-navy: #003057;
   --primary-blue: #0085d5;
   --dark-blue: #00426a;
   --medium-blue: #2281c4;
+
+  /* Neutrals */
   --white: #ffffff;
   --dark-gray: #202020;
   --medium-gray: #888b8d;
@@ -12,49 +16,88 @@
   --lighter-gray: #efefef;
 
   /* Sidebar dims */
-  --sidebar-width: 300px;
-  --header-height: 120px;
+  --sidebar-width: 350px;
+  --header-height: 80px;
+
+  /* Typography Dynamic Settings */
+  --doc-heading-font-family: var(--font-inter), 'Inter', sans-serif;
+  --doc-body-font-family: var(--font-inter), 'Inter', sans-serif;
+  --doc-h1-size: 32px;
+  --doc-h2-size: 22px;
+  --doc-h3-size: 16px;
+  --doc-p-size: 16px;
+  --doc-h1-weight: 800;
+  --doc-h2-weight: 600;
+  --doc-h3-weight: 500;
+  --doc-p-weight: 400;
 }
 
 /* ── Global resets ───────────────────────────────────────────────── */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+html, body { height: 100%; }
+
 body {
-  font-family: 'Roboto', Arial, Helvetica, sans-serif;
-  font-size: 14px;
-  line-height: 1.5;
-  color: var(--dark-gray);
-  background: var(--lighter-gray);
+  font-family: var(--doc-body-font-family);
+  font-size: var(--doc-p-size);
+  font-weight: var(--doc-p-weight);
+  line-height: 1.6;
+  color: #475569;
+  background: #f8fafc;
 }
 
+/* ── Global heading styles (Inter typography) ────────────────────── */
+h1 {
+  font-family: var(--doc-heading-font-family);
+  font-weight: var(--doc-h1-weight);
+  font-size: var(--doc-h1-size);
+  color: #0f172a;
+  letter-spacing: -0.02em;
+  margin-bottom: 32px;
+}
+
+h2 {
+  font-family: var(--doc-heading-font-family);
+  font-weight: var(--doc-h2-weight);
+  font-size: var(--doc-h2-size);
+  color: #1e293b;
+  margin-top: 40px;
+  margin-bottom: 16px;
+}
+
+/* ── Custom scrollbar ────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #999; }
+
 /* ── Public guide content prose styles ──────────────────────────── */
-/* h1 inside content is redundant (section-card header shows the guide title) */
 .guide-prose h1 { display: none; }
 .guide-prose h2 {
-  font-size: 20px; color: var(--primary-blue);
-  border-bottom: 1px solid var(--lighter-gray);
-  padding-bottom: 8px; margin-top: 32px; margin-bottom: 16px; font-weight: 400;
-  /* offset for sticky header so anchor links land correctly */
+  font-family: var(--doc-heading-font-family);
+  font-size: var(--doc-h2-size); color: #1e293b; font-weight: var(--doc-h2-weight);
+  margin-top: 40px; margin-bottom: 16px;
   scroll-margin-top: calc(var(--header-height) + 24px);
 }
 .guide-prose h3 {
-  font-size: 16px; margin-top: 24px; margin-bottom: 12px;
-  color: var(--primary-blue); font-weight: 500;
+  font-family: var(--doc-heading-font-family);
+  font-size: var(--doc-h3-size); margin-top: 24px; margin-bottom: 12px;
+  color: var(--primary-blue); font-weight: var(--doc-h3-weight);
   scroll-margin-top: calc(var(--header-height) + 24px);
 }
-.guide-prose p  { margin-bottom: 15px; }
-.guide-prose a  { color: var(--primary-blue); text-decoration: none; }
-.guide-prose a:hover { text-decoration: underline; }
-.guide-prose ul, .guide-prose ol { margin: 0 0 15px 25px; }
-.guide-prose li { margin-bottom: 6px; }
+.guide-prose p  { font-family: var(--doc-body-font-family); font-size: var(--doc-p-size); font-weight: var(--doc-p-weight); margin-bottom: 16px; line-height: 1.7; color: #334155; }
+.guide-prose a  { color: #2563eb; text-decoration: underline; font-family: var(--doc-body-font-family); }
+.guide-prose a:hover { color: #1d4ed8; }
+.guide-prose ul, .guide-prose ol { margin: 0 0 16px 24px; font-family: var(--doc-body-font-family); }
+.guide-prose li { margin-bottom: 6px; color: #334155; font-family: var(--doc-body-font-family); }
 .guide-prose strong { font-weight: 600; }
 .guide-prose code {
-  background: var(--lighter-gray); border-radius: 3px;
+  background: #f1f5f9; border-radius: 3px;
   padding: 1px 5px; font-size: 13px; font-family: 'Courier New', monospace;
 }
 .guide-prose pre {
   background: #1e293b; color: #e2e8f0; border-radius: 4px;
-  padding: 16px; overflow-x: auto; margin-bottom: 15px;
+  padding: 16px; overflow-x: auto; margin-bottom: 16px;
 }
 .guide-prose pre code { background: none; padding: 0; color: inherit; }
 .guide-prose table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
@@ -70,17 +113,41 @@ body {
   box-shadow: 0 4px 12px rgba(0,0,0,.15);
   display: block; margin: 0 auto;
 }
-/* plain <img> tags (not in figure) */
 .guide-prose img:not(figure img) {
   max-width: 50%; height: auto; border-radius: 4px;
   display: block; margin: 16px auto;
 }
-.guide-prose figcaption { font-size: 12px; color: var(--medium-gray); margin-top: 8px; font-style: italic; }
+.guide-prose figcaption { font-size: 12px; color: var(--medium-gray); margin-top: 8px; font-style: italic; text-align: center; }
 .guide-prose blockquote {
   border-left: 3px solid var(--primary-blue); margin: 15px 0;
   padding: 8px 16px; color: #555; background: #f8faff;
 }
 .guide-prose hr { border: none; border-top: 1px solid var(--lighter-gray); margin: 24px 0; }
+
+/* ── Callout boxes (note / warning) ──────────────────────────────── */
+.callout-note {
+  display: flex; align-items: flex-start;
+  background: #eff6ff; border: 1px solid #bfdbfe;
+  border-radius: 6px; padding: 20px; margin-bottom: 32px;
+}
+.callout-note .callout-icon {
+  background: #3b82f6; border-radius: 50%;
+  padding: 4px; margin-right: 16px; flex-shrink: 0; margin-top: 2px;
+  width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;
+}
+.callout-note .callout-icon svg { width: 14px; height: 14px; fill: #fff; }
+
+.callout-warning {
+  display: flex; align-items: flex-start;
+  background: #fef2f2; border: 1px solid #fecaca;
+  border-radius: 6px; padding: 20px; margin-bottom: 32px;
+}
+.callout-warning .callout-icon {
+  background: #ef4444; border-radius: 4px;
+  padding: 4px; margin-right: 16px; flex-shrink: 0; margin-top: 2px;
+  width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;
+}
+.callout-warning .callout-icon svg { width: 14px; height: 14px; fill: #fff; }
 
 /* ── TipTap editor prose (admin) ────────────────────────────────── */
 .tiptap-editor .ProseMirror {
@@ -126,7 +193,29 @@ body {
 .tiptap-editor .ProseMirror ul[data-type="taskList"] li { display: flex; align-items: flex-start; gap: 8px; }
 .tiptap-editor .ProseMirror ul[data-type="taskList"] li input[type="checkbox"] { margin-top: 3px; }
 
+/* ── Sidebar navigation link typography ──────────────────────────── */
+.sidebar-link {
+  font-family: var(--font-inter), 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: #64748b;
+}
+
+.sidebar-link.active {
+  color: #0f172a;
+  font-weight: 600;
+}
+
 /* Scrollbar for admin sidebar */
 .sidebar-scroll::-webkit-scrollbar { width: 4px; }
 .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
 .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+/* Hide scrollbar for public sidebar */
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

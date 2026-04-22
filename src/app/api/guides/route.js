@@ -12,7 +12,9 @@ export async function GET() {
 
 export async function POST(req) {
   const session = await getServerSession(authOptions)
-  if (!session) return Response.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!session || !['Admin', 'Developer', 'Editor'].includes(session.user?.role)) {
+    return Response.json({ error: 'Unauthorized' }, { status: 401 })
+  }
 
   const body = await req.json()
   const { slug, title, shortTitle, category } = body

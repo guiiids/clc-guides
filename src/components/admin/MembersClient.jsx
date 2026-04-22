@@ -493,7 +493,10 @@ export default function MembersClient({ members: initialMembers, currentUserId }
         <MemberModal
           title="Add New Member"
           onClose={() => setShowAdd(false)}
-          onSubmit={handleAddMember}
+          onSubmit={async (data) => {
+            await handleAddMember(data)
+            setShowAdd(false)
+          }}
           showPassword
         />
       )}

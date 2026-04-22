@@ -34,9 +34,11 @@ function slugify(str) {
 export default function Editor({ initialGuide, allGuides = [] }) {
   const router = useRouter()
   const [guide, setGuide] = useState(initialGuide)
+  const guideRef = useRef(initialGuide)
   const [saveState, setSaveState] = useState('saved') // 'saved' | 'saving' | 'error'
   const [showMeta, setShowMeta] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [exporting, setExporting] = useState(false)
   const saveTimer = useRef(null)
 
   // ── TipTap editor ────────────────────────────────────────────
@@ -74,8 +76,10 @@ export default function Editor({ initialGuide, allGuides = [] }) {
     content: initialGuide.content || '',
     onUpdate: ({ editor }) => {
       const html = editor.getHTML()
-      setGuide(g => ({ ...g, content: html }))
-      debouncedSave({ ...guide, content: html })
+      const updated = { ...guideRef.current, content: html }
+      guideRef.current = updated
+      setGuide(updated)
+      debouncedSave(updated)
     },
   })
 
@@ -108,13 +112,15 @@ export default function Editor({ initialGuide, allGuides = [] }) {
 
   // ── Field update helpers ─────────────────────────────────────
   function updateField(field, value) {
-    const updated = { ...guide, [field]: value }
+    const updated = { ...guideRef.current, [field]: value }
+    guideRef.current = updated
     setGuide(updated)
     debouncedSave(updated)
   }
 
   async function setStatus(status) {
-    const updated = { ...guide, status }
+    const updated = { ...guideRef.current, status }
+    guideRef.current = updated
     setGuide(updated)
     await saveNow(updated)
     router.refresh()
@@ -147,6 +153,168 @@ export default function Editor({ initialGuide, allGuides = [] }) {
     input.click()
   }
 
+  // ── PDF download ──────────────────────────────────────────────
+  async function handleDownloadPdf() {
+    if (exporting) return
+    setExporting(true)
+    try {
+      const html2pdf = (await import('html2pdf.js')).default
+
+      const exportDate = new Date().toLocaleDateString('en-US', {
+        year: 'numeric', month: 'long', day: 'numeric',
+      })
+      const statusLabel = guide.status.charAt(0).toUpperCase() + guide.status.slice(1)
+      const categoryLabel = guide.category || 'General'
+
+      // Build a professional document template
+      const container = document.createElement('div')
+      // Must be in DOM for html2canvas to render, but hide offscreen
+      container.style.position = 'fixed'
+      container.style.left = '-9999px'
+      container.style.top = '0'
+      container.style.width = '794px'  // A4 width in px at 96dpi
+      container.style.zIndex = '-1'
+      document.body.appendChild(container)
+      container.innerHTML = `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, sans-serif; color: #1e293b; line-height: 1.7;">
+
+          <!-- ── Accent bar ── -->
+          <div style="height: 4px; background: linear-gradient(90deg, #2563eb 0%, #3b82f6 40%, #60a5fa 100%); border-radius: 2px; margin-bottom: 28px;"></div>
+
+          <!-- ── Document header ── -->
+          <div style="margin-bottom: 32px;">
+            <div style="font-size: 11px; font-weight: 600; color: #2563eb; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;">
+              CLC Guide
+            </div>
+            <h1 style="font-size: 26px; font-weight: 700; margin: 0 0 14px; color: #0f172a; line-height: 1.3;">
+              ${guide.title}
+            </h1>
+            <div style="display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px;">
+              <span style="font-size: 11px; color: #64748b; background: #f1f5f9; padding: 3px 10px; border-radius: 9999px;">
+                📂 ${categoryLabel}
+              </span>
+              <span style="font-size: 11px; color: #64748b; background: #f1f5f9; padding: 3px 10px; border-radius: 9999px;">
+                ${statusLabel === 'Published' ? '🟢' : statusLabel === 'Draft' ? '🟡' : '⚪'} ${statusLabel}
+              </span>
+              <span style="font-size: 11px; color: #64748b; background: #f1f5f9; padding: 3px 10px; border-radius: 9999px;">
+                📅 ${exportDate}
+              </span>
+            </div>
+            <div style="height: 1px; background: #e2e8f0;"></div>
+          </div>
+
+          <!-- ── Article body ── -->
+          <div style="font-size: 14px; color: #334155; line-height: 1.75;">
+            ${guide.content || '<p style="color:#94a3b8; font-style:italic;">No content yet.</p>'}
+          </div>
+
+          <!-- ── Footer ── -->
+          <div style="margin-top: 48px; padding-top: 16px; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 10px; color: #94a3b8;">
+              ${guide.slug || 'guide'} • CLC Guides
+            </span>
+            <span style="font-size: 10px; color: #94a3b8;">
+              Generated on ${exportDate}
+            </span>
+          </div>
+        </div>
+      `
+
+      // ── Style inner elements for clean PDF rendering ──
+      container.querySelectorAll('h1').forEach((el, i) => {
+        if (i > 0) { // skip the title h1 which is already styled
+          el.style.fontSize = '22px'; el.style.fontWeight = '700'; el.style.color = '#0f172a'
+          el.style.marginTop = '32px'; el.style.marginBottom = '10px'
+        }
+      })
+      container.querySelectorAll('h2').forEach(el => {
+        el.style.fontSize = '18px'; el.style.fontWeight = '600'; el.style.color = '#0f172a'
+        el.style.marginTop = '32px'; el.style.marginBottom = '10px'
+        el.style.paddingBottom = '6px'; el.style.borderBottom = '1px solid #f1f5f9'
+      })
+      container.querySelectorAll('h3').forEach(el => {
+        el.style.fontSize = '15px'; el.style.fontWeight = '600'; el.style.color = '#1e293b'
+        el.style.marginTop = '24px'; el.style.marginBottom = '8px'
+      })
+      container.querySelectorAll('p').forEach(el => {
+        el.style.marginTop = '0'; el.style.marginBottom = '12px'
+      })
+      container.querySelectorAll('pre').forEach(el => {
+        el.style.background = '#f8fafc'; el.style.padding = '14px 18px'
+        el.style.borderRadius = '8px'; el.style.fontSize = '12px'
+        el.style.overflowX = 'auto'; el.style.lineHeight = '1.65'
+        el.style.border = '1px solid #e2e8f0'; el.style.margin = '16px 0'
+      })
+      container.querySelectorAll('code').forEach(el => {
+        if (el.parentElement?.tagName !== 'PRE') {
+          el.style.background = '#f1f5f9'; el.style.padding = '2px 6px'
+          el.style.borderRadius = '4px'; el.style.fontSize = '13px'
+          el.style.color = '#e11d48'; el.style.fontWeight = '500'
+        }
+      })
+      container.querySelectorAll('table').forEach(el => {
+        el.style.width = '100%'; el.style.borderCollapse = 'collapse'
+        el.style.fontSize = '13px'; el.style.margin = '16px 0'
+      })
+      container.querySelectorAll('th, td').forEach(el => {
+        el.style.border = '1px solid #e2e8f0'; el.style.padding = '8px 12px'
+        el.style.textAlign = 'left'
+      })
+      container.querySelectorAll('th').forEach(el => {
+        el.style.background = '#f8fafc'; el.style.fontWeight = '600'
+        el.style.color = '#334155'; el.style.fontSize = '12px'
+        el.style.textTransform = 'uppercase'; el.style.letterSpacing = '0.03em'
+      })
+      container.querySelectorAll('img').forEach(el => {
+        el.style.maxWidth = '100%'; el.style.borderRadius = '8px'
+        el.style.margin = '16px 0'; el.style.border = '1px solid #f1f5f9'
+      })
+      container.querySelectorAll('ul, ol').forEach(el => {
+        el.style.paddingLeft = '22px'; el.style.margin = '12px 0'
+      })
+      container.querySelectorAll('li').forEach(el => {
+        el.style.marginBottom = '4px'
+      })
+      container.querySelectorAll('blockquote').forEach(el => {
+        el.style.borderLeft = '3px solid #3b82f6'; el.style.margin = '16px 0'
+        el.style.paddingLeft = '16px'; el.style.color = '#475569'
+        el.style.background = '#f8fafc'; el.style.padding = '12px 16px'
+        el.style.borderRadius = '0 6px 6px 0'
+      })
+      container.querySelectorAll('hr').forEach(el => {
+        el.style.border = 'none'; el.style.height = '1px'
+        el.style.background = '#e2e8f0'; el.style.margin = '24px 0'
+      })
+      // Task list checkboxes
+      container.querySelectorAll('ul[data-type="taskList"] li').forEach(el => {
+        el.style.listStyleType = 'none'
+      })
+      container.querySelectorAll('a').forEach(el => {
+        el.style.color = '#2563eb'; el.style.textDecoration = 'underline'
+      })
+      container.querySelectorAll('strong').forEach(el => {
+        el.style.fontWeight = '600'; el.style.color = '#0f172a'
+      })
+
+      const slug = guide.slug || 'guide'
+      await html2pdf().set({
+        margin:       [10, 14, 14, 14],  // mm
+        filename:     `${slug}.pdf`,
+        image:        { type: 'jpeg', quality: 0.96 },
+        html2canvas:  { scale: 2, useCORS: true, logging: false },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] },
+      }).from(container).save()
+      // Cleanup: remove the offscreen container
+      document.body.removeChild(container)
+    } catch (err) {
+      console.error('PDF export failed:', err)
+      alert('PDF export failed. Check the console for details.')
+    } finally {
+      setExporting(false)
+    }
+  }
+
   // ── Save indicator ───────────────────────────────────────────
   const saveLabel = saveState === 'saving' ? 'Saving…'
     : saveState === 'error' ? 'Save failed'
@@ -159,24 +327,24 @@ export default function Editor({ initialGuide, allGuides = [] }) {
 
       {/* ── Left sidebar: guide list nav ── */}
       <aside style={{
-        width: 240, flexShrink: 0, background: '#0f1629',
-        borderRight: '1px solid rgba(255,255,255,0.05)',
+        width: 240, flexShrink: 0, background: '#ffffff',
+        borderRight: '1px solid #e2e8f0',
         display: 'flex', flexDirection: 'column', overflow: 'hidden',
       }}>
-        <div style={{ padding: '12px 12px 8px', borderBottom: '1px solid rgba(255,255,255,0.06)', flexShrink: 0 }}>
-          <a href="/admin" style={{ color: '#60a5fa', fontSize: 12, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
+        <div style={{ padding: '12px 12px 8px', borderBottom: '1px solid #e2e8f0', flexShrink: 0 }}>
+          <a href="/admin" style={{ color: '#2563eb', fontSize: 12, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
             ← All guides
           </a>
         </div>
         <div style={{ padding: '16px 16px 8px', flexShrink: 0 }}>
-          <div style={{ fontSize: 11, color: '#3d5275', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+          <div style={{ fontSize: 11, color: '#94a3b8', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
             Editing
           </div>
-          <div style={{ fontSize: 13, color: '#e2e8f0', fontWeight: 500, marginTop: 6, lineHeight: 1.4 }}>
+          <div style={{ fontSize: 13, color: '#0f172a', fontWeight: 500, marginTop: 6, lineHeight: 1.4 }}>
             {guide.title}
           </div>
         </div>
-        <div style={{ padding: '8px 12px 12px', flexShrink: 0, borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <div style={{ padding: '8px 12px 12px', flexShrink: 0, borderBottom: '1px solid #e2e8f0' }}>
           <span style={{
             ...(STATUS_STYLE[guide.status] || STATUS_STYLE.draft),
             borderRadius: 9999, padding: '3px 10px', fontSize: 11, fontWeight: 500,
@@ -197,7 +365,7 @@ export default function Editor({ initialGuide, allGuides = [] }) {
             return Object.entries(grouped).map(([category, guides]) => (
               <div key={category} style={{ marginBottom: 4 }}>
                 <div style={{
-                  fontSize: 10, color: '#3d5275', fontWeight: 600, textTransform: 'uppercase',
+                  fontSize: 10, color: '#94a3b8', fontWeight: 600, textTransform: 'uppercase',
                   letterSpacing: '0.06em', padding: '10px 16px 4px',
                 }}>
                   {category}
@@ -214,22 +382,22 @@ export default function Editor({ initialGuide, allGuides = [] }) {
                         display: 'flex', alignItems: 'center', gap: 8,
                         padding: '7px 16px',
                         fontSize: 12, fontWeight: isActive ? 500 : 400,
-                        color: isActive ? '#e2e8f0' : '#94a3b8',
+                        color: isActive ? '#0f172a' : '#64748b',
                         textDecoration: 'none',
-                        background: isActive ? 'rgba(255,255,255,0.06)' : 'transparent',
-                        borderLeft: isActive ? '2px solid #60a5fa' : '2px solid transparent',
+                        background: isActive ? '#f1f5f9' : 'transparent',
+                        borderLeft: isActive ? '2px solid #2563eb' : '2px solid transparent',
                         transition: 'all 120ms',
                       }}
                       onMouseEnter={e => {
                         if (!isActive) {
-                          e.currentTarget.style.background = 'rgba(255,255,255,0.03)'
-                          e.currentTarget.style.color = '#cbd5e1'
+                          e.currentTarget.style.background = '#f8fafc'
+                          e.currentTarget.style.color = '#334155'
                         }
                       }}
                       onMouseLeave={e => {
                         if (!isActive) {
                           e.currentTarget.style.background = 'transparent'
-                          e.currentTarget.style.color = '#94a3b8'
+                          e.currentTarget.style.color = '#64748b'
                         }
                       }}
                     >
@@ -299,6 +467,19 @@ export default function Editor({ initialGuide, allGuides = [] }) {
             >
               Preview ↗
             </a>
+
+            <button
+              onClick={handleDownloadPdf}
+              disabled={exporting}
+              style={{
+                padding: '5px 12px', background: '#f1f5f9', color: '#64748b',
+                borderRadius: 5, fontSize: 12, border: '1px solid #e2e8f0',
+                cursor: exporting ? 'wait' : 'pointer', fontFamily: 'inherit',
+                opacity: exporting ? 0.6 : 1, transition: 'opacity 150ms',
+              }}
+            >
+              {exporting ? 'Exporting…' : 'PDF ↓'}
+            </button>
 
             <button
               onClick={() => setShowMeta(m => !m)}

@@ -11,7 +11,7 @@ export default function PublicHeader({ guides }) {
     function onScroll() {
       const headerH = parseInt(
         getComputedStyle(document.documentElement).getPropertyValue('--header-height')
-      ) || 120
+      ) || 64
 
       const guideThreshold = headerH + 20
       let current = guides[0]
@@ -30,41 +30,53 @@ export default function PublicHeader({ guides }) {
 
   return (
     <header style={{
-      backgroundImage: "url('https://content.tst-34.aws.agilent.com/wp-content/uploads/2025/09/logo-2.png')",
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundColor: '#00426a',
+      background: '#003057',
       color: '#fff',
-      padding: '30px 0',
-      position: 'sticky',
-      top: 0,
-      zIndex: 100,
-      boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
-      minHeight: 'var(--header-height)',
+      height: 'var(--header-height)',
       display: 'flex',
       alignItems: 'center',
+      justifyContent: 'space-between',
+      padding: '0 24px',
+      flexShrink: 0,
+      position: 'sticky',
+      top: 0,
+      zIndex: 50,
     }}>
-      <div style={{
-        width: '100%', maxWidth: '80%', margin: '0 auto',
-        padding: '0 40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-      }}>
-        {/* Left: current guide title */}
-        <div style={{ flex: '0 0 50%' }}>
-          <p style={{ fontSize: 18, fontWeight: 300, color: '#fff', margin: 0, lineHeight: 1.3 }}>
-            {currentTitle}
-          </p>
-        </div>
+      {/* Left: Brand */}
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        <img src="/logo.png" alt="Agilent CrossLab Connect" style={{ height: 48, objectFit: 'contain' }} />
+      </div>
 
-        {/* Right: Agilent logo */}
-        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="https://www.agilent.com/cs/agilent_images/icon-agilent-logo-white-white-2x.png"
-            alt="Agilent"
-            style={{ height: 60, width: 'auto' }}
+      {/* Center: Search Bar */}
+      <div style={{ flex: 1, maxWidth: 640, padding: '0 32px' }}>
+        <div style={{ position: 'relative' }}>
+          <div style={{
+            position: 'absolute', top: 0, bottom: 0, left: 12,
+            display: 'flex', alignItems: 'center', pointerEvents: 'none',
+          }}>
+            <svg style={{ width: 20, height: 20, color: '#94a3b8' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+            </svg>
+          </div>
+          <input
+            type="text"
+            placeholder="Search the Knowledge Base (Cmd+K)"
+            style={{
+              display: 'block',
+              width: '100%',
+              background: '#fff',
+              color: '#0f172a',
+              border: 'none',
+              borderRadius: 6,
+              padding: '8px 12px 8px 40px',
+              fontSize: 14,
+              outline: 'none',
+            }}
           />
         </div>
       </div>
+
+      {/* Right: Empty to balance flex-between if needed, or just removed entirely */}
     </header>
   )
 }

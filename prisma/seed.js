@@ -84,7 +84,14 @@ async function main() {
 
   console.log('\nSeeding admin user...')
   const email = process.env.SEED_ADMIN_EMAIL || 'admin@example.com'
-  const password = process.env.SEED_ADMIN_PASSWORD || 'changeme123'
+  let password = process.env.SEED_ADMIN_PASSWORD
+
+  if (process.env.NODE_ENV === 'production' && !password) {
+    console.error('FATAL: SEED_ADMIN_PASSWORD must be set in production')
+    process.exit(1)
+  }
+
+  password = password || 'changeme123'
   const hash = await bcrypt.hash(password, 12)
 
   await prisma.adminUser.upsert({

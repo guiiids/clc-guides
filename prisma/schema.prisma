@@ -28,6 +28,22 @@ model Guide {
   tags           String   @default("")         // comma-separated
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+  revisions      GuideRevision[]
+}
+
+/// Versioned snapshots — a new row is saved BEFORE every content change.
+/// This is a write-only safety net; revisions are never deleted automatically.
+model GuideRevision {
+  id        Int      @id @default(autoincrement())
+  guideId   Int
+  guide     Guide    @relation(fields: [guideId], references: [id], onDelete: Cascade)
+  version   Int                            // auto-incrementing per guide
+  content   String                         // full HTML snapshot
+  title     String                         // title at time of snapshot
+  savedBy   String   @default("system")    // email or "system"
+  savedAt   DateTime @default(now())
+
+  @@index([guideId, version])
 }
 
 model AdminUser {

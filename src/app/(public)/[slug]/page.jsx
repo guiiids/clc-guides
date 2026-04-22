@@ -3,8 +3,18 @@ import { prisma } from '@/lib/db'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 
-export async function generateMetadata() {
-  return {}
+import { sanitizeHtml } from '@/lib/sanitize'
+
+export async function generateMetadata({ params }) {
+  const { slug } = await params
+  const guide = await prisma.guide.findUnique({
+    where: { slug },
+    select: { title: true, seoTitle: true, seoDescription: true }
+  })
+  return {
+    title: guide?.seoTitle || guide?.title,
+    description: guide?.seoDescription || ''
+  }
 }
 
 export default async function GuideSlugPage({ params, searchParams }) {
@@ -39,13 +49,13 @@ export default async function GuideSlugPage({ params, searchParams }) {
           borderBottom: '1px solid var(--lighter-gray)', marginBottom: 24,
           borderRadius: 4,
         }}>
-          <h1 style={{ fontSize: 28, fontWeight: 500, margin: 0, color: 'var(--dark-gray)' }}>
+          <h1 style={{ margin: 0, color: 'var(--dark-gray)' }}>
             {guide.title}
           </h1>
         </div>
 
         {guide.content ? (
-          <div className="guide-prose" dangerouslySetInnerHTML={{ __html: guide.content }} />
+          <div className="guide-prose" dangerouslySetInnerHTML={{ __html: sanitizeHtml(guide.content) }} />
         ) : (
           <p style={{ color: 'var(--medium-gray)', fontStyle: 'italic' }}>Content coming soon.</p>
         )}
