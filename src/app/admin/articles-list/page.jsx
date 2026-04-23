@@ -74,7 +74,7 @@ export default async function ArticlesListPage({ searchParams }) {
         })}
       </div>
 
-      <ArticlesListClient guides={guides} />
+      <ArticlesListClient guides={guides.map(g => ({ ...g, updatedAt: g.updatedAt.toISOString(), createdAt: g.createdAt.toISOString() }))} />
     </div>
   )
 }
