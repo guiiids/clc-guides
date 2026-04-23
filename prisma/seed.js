@@ -76,7 +76,7 @@ async function main() {
   for (const guide of GUIDES) {
     await prisma.guide.upsert({
       where: { slug: guide.slug },
-      update: {},   // don't overwrite content if already edited
+      update: { status: 'published' },   // always restore published status on re-seed
       create: { ...guide, status: 'published', content: '', seoTitle: '', seoDescription: '', tags: '' },
     })
     console.log(`  ✓ ${guide.slug}`)

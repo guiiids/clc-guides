@@ -1,23 +1,6 @@
 import { prisma } from '@/lib/db'
 import Link from 'next/link'
-
-const STATUS_STYLE = {
-  published: { background: '#d1fae5', color: '#065f46' },
-  draft:     { background: '#fef3c7', color: '#92400e' },
-  archived:  { background: '#f1f5f9', color: '#64748b' },
-}
-
-function timeAgo(date) {
-  const diff = Date.now() - new Date(date).getTime()
-  const m = Math.floor(diff / 60000)
-  if (m < 1) return 'just now'
-  if (m < 60) return `${m}m ago`
-  const h = Math.floor(diff / 3_600_000)
-  if (h < 24) return `${h}h ago`
-  const d = Math.floor(diff / 86_400_000)
-  if (d < 7) return `${d}d ago`
-  return `${Math.floor(d / 7)}w ago`
-}
+import ArticlesListClient from './ArticlesListClient'
 
 export default async function ArticlesListPage({ searchParams }) {
   const { status } = await searchParams
@@ -35,10 +18,10 @@ export default async function ArticlesListPage({ searchParams }) {
   })
 
   const tabs = [
-    { id: 'all', label: 'All' },
+    { id: 'all',       label: 'All' },
     { id: 'published', label: 'Published' },
-    { id: 'draft', label: 'Drafts' },
-    { id: 'archived', label: 'Archived' },
+    { id: 'draft',     label: 'Drafts' },
+    { id: 'archived',  label: 'Archived' },
   ]
   const activeTab = status || 'all'
 
@@ -62,7 +45,7 @@ export default async function ArticlesListPage({ searchParams }) {
       </div>
 
       {/* Filter tabs */}
-      <div style={{ display: 'flex', gap: 4, marginBottom: 20, borderBottom: '1px solid #e2e8f0', paddingBottom: 0 }}>
+      <div style={{ display: 'flex', gap: 4, marginBottom: 20, borderBottom: '1px solid #e2e8f0' }}>
         {tabs.map(tab => {
           const active = activeTab === tab.id
           return (
@@ -79,7 +62,8 @@ export default async function ArticlesListPage({ searchParams }) {
             >
               {tab.label}
               <span style={{
-                marginLeft: 6, fontSize: 11, background: active ? '#eff6ff' : '#f1f5f9',
+                marginLeft: 6, fontSize: 11,
+                background: active ? '#eff6ff' : '#f1f5f9',
                 color: active ? '#2563eb' : '#94a3b8',
                 borderRadius: 9999, padding: '1px 7px', fontWeight: 500,
               }}>
@@ -90,47 +74,7 @@ export default async function ArticlesListPage({ searchParams }) {
         })}
       </div>
 
-      {/* Guide list */}
-      <style>{`.articles-list-item:hover { background: #f8fafc !important; }`}</style>
-      <div style={{ background: '#fff', borderRadius: 8, border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-        {guides.length === 0 ? (
-          <div style={{ padding: '48px 0', textAlign: 'center', color: '#94a3b8', fontSize: 14 }}>
-            No guides found.
-          </div>
-        ) : (
-          guides.map((guide, i) => (
-            <Link
-              key={guide.id}
-              href={`/admin/${guide.slug}`}
-              className="articles-list-item"
-              style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                padding: '14px 20px', textDecoration: 'none',
-                borderBottom: i < guides.length - 1 ? '1px solid #f1f5f9' : 'none',
-                transition: 'background 150ms',
-              }}
-            >
-              <div>
-                <div style={{ fontSize: 14, fontWeight: 500, color: '#0f172a', marginBottom: 3 }}>
-                  {guide.title}
-                </div>
-                <div style={{ fontSize: 12, color: '#94a3b8' }}>
-                  {guide.category} · Updated {timeAgo(guide.updatedAt)}
-                </div>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
-                <span style={{
-                  ...(STATUS_STYLE[guide.status] || STATUS_STYLE.draft),
-                  borderRadius: 9999, padding: '3px 10px', fontSize: 11, fontWeight: 500,
-                }}>
-                  {guide.status.charAt(0).toUpperCase() + guide.status.slice(1)}
-                </span>
-                <span style={{ color: '#cbd5e1', fontSize: 18 }}>›</span>
-              </div>
-            </Link>
-          ))
-        )}
-      </div>
+      <ArticlesListClient guides={guides} />
     </div>
   )
 }
