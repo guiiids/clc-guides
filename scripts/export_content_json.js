@@ -17,8 +17,9 @@ const fs        = require('fs')
 const path      = require('path')
 const crypto    = require('crypto')
 
-const HTML_FILE = path.join(__dirname, '..', '..', 'iteration-1-standalone.html')
-const OUT_FILE  = path.join(__dirname, '..', '..', 'guide_content.json')
+const HTML_FILE  = path.join(__dirname, '..', '..', 'iteration-1-standalone.html')
+const OUT_FILE   = path.join(__dirname, '..', '..', 'guide_content.json')
+const IMAGES_DIR = path.join(__dirname, '..', '..', 'guide_images')
 
 const SECTION_MAP = {
   'introduction-guide':  'introduction',
@@ -36,6 +37,30 @@ function toId(text) {
     .replace(/[^\w\s-]/g, '')
     .replace(/[\s_]+/g, '-')
     .slice(0, 80)
+}
+
+function mimeToExt(mime) {
+  const map = { 'image/png': '.png', 'image/jpeg': '.jpg', 'image/jpg': '.jpg', 'image/gif': '.gif', 'image/webp': '.webp' }
+  return map[mime] || '.png'
+}
+
+// Extracts base64 data URIs from img tags, saves them as files in guide_images/,
+// and replaces the src with /uploads/<filename> so Azure can serve them.
+function extractImages(node) {
+  fs.mkdirSync(IMAGES_DIR, { recursive: true })
+  let count = 0
+  node.querySelectorAll('img').forEach(img => {
+    const src = img.getAttribute('src') || ''
+    if (!src.startsWith('data:')) return
+    const [meta, b64] = src.split(',')
+    const mime = meta.replace('data:', '').replace(';base64', '')
+    const filename = `${crypto.randomUUID()}${mimeToExt(mime)}`
+    fs.writeFileSync(path.join(IMAGES_DIR, filename), Buffer.from(b64, 'base64'))
+    img.setAttribute('src', `/uploads/${filename}`)
+    img.setAttribute('loading', 'lazy')
+    count++
+  })
+  return count
 }
 
 function extractContent(sectionNode) {
@@ -106,14 +131,16 @@ for (const [sectionId, slug] of Object.entries(SECTION_MAP)) {
     continue
   }
 
-  const content = extractContent(section)
+  const imgCount = extractImages(section)
+  const content  = extractContent(section)
   output.push({ slug, content, status: 'published' })
-  console.log(`  ✓ ${slug}`)
+  console.log(`  ✓ ${slug} (${imgCount} images extracted)`)
 }
 
 fs.writeFileSync(OUT_FILE, JSON.stringify(output, null, 2))
 console.log(`\nWrote ${output.length} guides → ${OUT_FILE}`)
+console.log(`Images saved → ${IMAGES_DIR}/`)
 console.log('\nNext steps:')
-console.log('  1. Upload guide_content.json to /home/data/ via Kudu file browser')
-console.log('  2. Restart the Azure app (Portal → Restart or az webapp restart)')
-console.log('  3. Startup.sh will import and delete the file automatically')
+console.log('  1. Upload all files from guide_images/ to /home/uploads/ via Kudu file browser')
+console.log('  2. Upload guide_content.json to /home/data/ via Kudu file browser')
+console.log('  3. Restart the Azure app — startup.sh will import and delete the file')
