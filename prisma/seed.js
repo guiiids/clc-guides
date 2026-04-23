@@ -101,6 +101,26 @@ async function main() {
   })
   console.log(`  ✓ ${email}`)
 
+  // Seed team members
+  console.log('\nSeeding team members...')
+  const memberPassword = await bcrypt.hash(password, 12)
+  const MEMBERS = [
+    { email: 'craig.kreutzberg@agilent.com', name: 'Craig Kreutzberg', role: 'Author' },
+    { email: 'valentin.rusu@agilent.com',    name: 'Valentin Rusu',    role: 'Author' },
+    { email: 'seth.viney@agilent.com',       name: 'Seth Viney',       role: 'Author' },
+    { email: 'brittany.stille@agilent.com',  name: 'Brittany Stille',  role: 'Author' },
+    { email: 'vinod.rajendran@agilent.com',  name: 'Vinod Rajendran',  role: 'Author' },
+  ]
+
+  for (const m of MEMBERS) {
+    await prisma.adminUser.upsert({
+      where: { email: m.email },
+      update: {},
+      create: { email: m.email, password_hash: memberPassword, name: m.name, role: m.role },
+    })
+    console.log(`  ✓ ${m.email}`)
+  }
+
   console.log('\nDone.')
 }
 
