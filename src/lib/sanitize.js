@@ -9,7 +9,7 @@ export function sanitizeHtml(dirty) {
   if (!dirty) return ''
   return DOMPurify.sanitize(dirty, {
     ADD_TAGS: ['figure', 'figcaption', 'iframe'],
-    ADD_ATTR: ['id', 'loading', 'target', 'rel', 'data-type'],
+    ADD_ATTR: ['id', 'loading', 'target', 'rel', 'data-type', 'class'],
     FORBID_TAGS: ['script', 'style', 'form', 'input', 'textarea', 'select'],
     FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover'],
   })
