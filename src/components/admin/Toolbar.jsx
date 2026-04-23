@@ -52,7 +52,7 @@ export default function Toolbar({ editor, onImageUpload }) {
     <div style={{
       display: 'flex', alignItems: 'center', gap: 2, padding: '5px 24px',
       borderBottom: '1px solid #e2e8f0', background: '#fff',
-      overflowX: 'auto', flexShrink: 0, flexWrap: 'wrap',
+      overflowX: 'auto', flexShrink: 0, flexWrap: 'nowrap',
     }}>
       {/* Block type */}
       <select

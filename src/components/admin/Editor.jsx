@@ -2,11 +2,11 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { useEditor, EditorContent } from '@tiptap/react'
+import { useEditor, EditorContent, NodeViewWrapper, ReactNodeViewRenderer } from '@tiptap/react'
+import { Node, mergeAttributes } from '@tiptap/core'
 import StarterKit from '@tiptap/starter-kit'
 import Heading from '@tiptap/extension-heading'
 import UnderlineExtension from '@tiptap/extension-underline'
-import ImageExtension from '@tiptap/extension-image'
 import TaskList from '@tiptap/extension-task-list'
 import TaskItem from '@tiptap/extension-task-item'
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
@@ -17,6 +17,70 @@ import Color from '@tiptap/extension-color'
 import { Table, TableRow, TableHeader, TableCell } from '@tiptap/extension-table'
 import { createLowlight, common } from 'lowlight'
 import Toolbar from './Toolbar'
+
+// ── Custom image node with selection UI ──────────────────────────────────────
+function ImageNodeView({ node, selected, deleteNode }) {
+  return (
+    <NodeViewWrapper style={{ display: 'block', position: 'relative', margin: '12px 0' }}>
+      <img
+        src={node.attrs.src}
+        alt={node.attrs.alt || ''}
+        title={node.attrs.title || ''}
+        style={{
+          maxWidth: '100%',
+          borderRadius: 6,
+          display: 'block',
+          outline: selected ? '2px solid #2563eb' : '2px solid transparent',
+          outlineOffset: 2,
+          transition: 'outline 100ms',
+        }}
+      />
+      {selected && (
+        <div style={{
+          position: 'absolute', top: 8, right: 8,
+          display: 'flex', gap: 6,
+        }}>
+          <button
+            onMouseDown={e => { e.preventDefault(); deleteNode() }}
+            style={{
+              background: '#ef4444', color: '#fff', border: 'none',
+              borderRadius: 5, padding: '3px 10px', fontSize: 12,
+              fontWeight: 600, cursor: 'pointer',
+            }}
+          >
+            Remove
+          </button>
+        </div>
+      )}
+    </NodeViewWrapper>
+  )
+}
+
+const CustomImage = Node.create({
+  name: 'image',
+  group: 'block',
+  atom: true,
+  draggable: true,
+  addAttributes() {
+    return {
+      src:   { default: null },
+      alt:   { default: null },
+      title: { default: null },
+    }
+  },
+  parseHTML() { return [{ tag: 'img[src]' }] },
+  renderHTML({ HTMLAttributes }) {
+    return ['img', mergeAttributes(HTMLAttributes)]
+  },
+  addNodeView() {
+    return ReactNodeViewRenderer(ImageNodeView)
+  },
+  addCommands() {
+    return {
+      setImage: attrs => ({ commands }) => commands.insertContent({ type: this.name, attrs }),
+    }
+  },
+})
 
 const lowlight = createLowlight(common)
 
@@ -60,7 +124,7 @@ export default function Editor({ initialGuide, allGuides = [] }) {
         },
       }),
       UnderlineExtension,
-      ImageExtension,
+      CustomImage,
       TaskList,
       TaskItem.configure({ nested: true }),
       CodeBlockLowlight.configure({ lowlight }),
