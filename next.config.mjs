@@ -1,6 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'standalone',
+  async rewrites() {
+    return [
+      {
+        source: '/onboarding/user-guide',
+        destination: '/onboarding/user-guide.html',
+      },
+    ]
+  },
   async headers() {
     return [
       {

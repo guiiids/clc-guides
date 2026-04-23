@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CLC Knowledge Base — User Guide</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:    #0068b5;
+      --blue-lt: #e6f0f8;
+      --slate:   #0f172a;
+      --muted:   #64748b;
+      --border:  #e2e8f0;
+      --bg:      #f8fafc;
+      --white:   #ffffff;
+      --green:   #16a34a;
+      --green-lt:#dcfce7;
+      --amber:   #d97706;
+      --amber-lt:#fef3c7;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      color: var(--slate);
+      background: var(--white);
+      font-size: 14px;
+      line-height: 1.7;
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 48px 40px;
+    }
+
+    /* ── Cover ─────────────────────────────────────── */
+    .cover {
+      text-align: center;
+      padding: 72px 0 64px;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 56px;
+    }
+    .cover-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 32px;
+    }
+    .cover-logo-mark {
+      width: 40px; height: 40px;
+      background: var(--blue);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .cover-logo-mark svg { width: 22px; height: 22px; color: white; }
+    .cover-logo-text { font-size: 18px; font-weight: 700; color: var(--slate); }
+    .cover h1 {
+      font-size: 36px; font-weight: 800;
+      color: var(--slate); margin-bottom: 12px;
+      line-height: 1.2;
+    }
+    .cover p {
+      font-size: 16px; color: var(--muted);
+      max-width: 480px; margin: 0 auto 28px;
+    }
+    .cover-meta {
+      display: inline-flex; gap: 24px;
+      font-size: 13px; color: var(--muted);
+    }
+    .cover-meta span { display: flex; align-items: center; gap: 6px; }
+
+    /* ── Section ───────────────────────────────────── */
+    .section { margin-bottom: 56px; }
+    .section-header {
+      display: flex; align-items: center; gap: 14px;
+      margin-bottom: 28px; padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-num {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--blue); color: white;
+      font-size: 15px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .section-title { font-size: 22px; font-weight: 700; color: var(--slate); }
+
+    /* ── Steps ─────────────────────────────────────── */
+    .steps { display: flex; flex-direction: column; gap: 20px; }
+    .step {
+      display: flex; gap: 18px;
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px 22px;
+    }
+    .step-num {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--blue-lt); color: var(--blue);
+      font-size: 13px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 1px;
+    }
+    .step-body {}
+    .step-body strong { display: block; font-size: 15px; font-weight: 600; margin-bottom: 4px; color: var(--slate); }
+    .step-body p { color: var(--muted); font-size: 14px; }
+
+    /* ── Tip / Note ────────────────────────────────── */
+    .tip {
+      display: flex; gap: 14px; align-items: flex-start;
+      border-radius: 10px; padding: 16px 18px; margin-top: 20px;
+    }
+    .tip.blue  { background: var(--blue-lt);  border-left: 4px solid var(--blue); }
+    .tip.green { background: var(--green-lt); border-left: 4px solid var(--green); }
+    .tip.amber { background: var(--amber-lt); border-left: 4px solid var(--amber); }
+    .tip-icon { font-size: 18px; flex-shrink: 0; line-height: 1.4; }
+    .tip p { font-size: 13px; color: var(--slate); }
+    .tip strong { color: var(--slate); }
+
+    /* ── URL pill ──────────────────────────────────── */
+    .url-pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--slate); color: white;
+      border-radius: 8px; padding: 10px 16px;
+      font-size: 13px; font-weight: 500;
+      text-decoration: none; margin-top: 12px;
+      word-break: break-all;
+    }
+    .url-pill svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+    /* ── Feature grid ──────────────────────────────── */
+    .feature-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 14px; margin-top: 4px;
+    }
+    .feature-card {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 12px; padding: 18px 20px;
+    }
+    .feature-card .fc-icon { font-size: 22px; margin-bottom: 10px; }
+    .feature-card strong { display: block; font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+    .feature-card p { font-size: 13px; color: var(--muted); }
+
+    /* ── Community card ────────────────────────────── */
+    .community-card {
+      background: linear-gradient(135deg, #0068b5 0%, #0050a0 100%);
+      border-radius: 16px; padding: 36px;
+      color: white; text-align: center;
+    }
+    .community-card h3 { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
+    .community-card p { font-size: 15px; opacity: 0.85; margin-bottom: 24px; line-height: 1.6; }
+    .community-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: white; color: var(--blue);
+      border-radius: 8px; padding: 12px 24px;
+      font-size: 14px; font-weight: 700;
+      text-decoration: none; transition: opacity 150ms;
+    }
+    .community-btn svg { width: 16px; height: 16px; }
+    .community-url {
+      margin-top: 16px; font-size: 12px;
+      opacity: 0.6; word-break: break-all;
+    }
+
+    /* ── Footer ────────────────────────────────────── */
+    .footer {
+      margin-top: 64px; padding-top: 24px;
+      border-top: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 12px; color: var(--muted);
+    }
+
+    /* ── Print ─────────────────────────────────────── */
+    @media print {
+      body { padding: 0; }
+      .cover { padding: 48px 0 40px; }
+      .section { page-break-inside: avoid; }
+      .step { page-break-inside: avoid; }
+      .community-card { page-break-inside: avoid; }
+      a { color: inherit; text-decoration: none; }
+      .community-btn { border: 2px solid var(--blue); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Cover ────────────────────────────────────────────── -->
+  <div class="cover">
+    <div class="cover-logo">
+      <div class="cover-logo-mark">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <span class="cover-logo-text">Agilent CrossLab Connect</span>
+    </div>
+    <h1>Knowledge Base<br>User Guide</h1>
+    <p>How to log in, manage guides, and share content with the CrossLab community.</p>
+    <div class="cover-meta">
+      <span>
+        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-width="2" stroke-linecap="round"/></svg>
+        April 2026
+      </span>
+      <span>
+        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0" stroke-width="2" stroke-linecap="round"/></svg>
+        CLC Team
+      </span>
+      <span>
+        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke-width="2" stroke-linecap="round"/></svg>
+        5 min read
+      </span>
+    </div>
+  </div>
+
+
+  <!-- ── Section 1: Logging In ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <div class="section-title">Logging In</div>
+    </div>
+
+    <div style="
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px 24px; margin-bottom: 24px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+    ">
+      <div>
+        <p style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 6px;">Username</p>
+        <p style="font-size: 14px; font-weight: 600; color: var(--slate);">Your Agilent email address</p>
+        <p style="font-size: 13px; color: var(--muted);">e.g. firstname.lastname@agilent.com</p>
+      </div>
+      <div>
+        <p style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 6px;">Initial Password</p>
+        <p style="font-size: 15px; font-weight: 700; color: var(--slate); font-family: monospace; letter-spacing: 0.05em;">changeme123</p>
+        <p style="font-size: 13px; color: var(--amber);">Change this after your first login</p>
+      </div>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <strong>Open the admin panel</strong>
+          <p>Go to the link below in any web browser. Bookmark it so you can find it easily next time.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <strong>Enter your Agilent email and password</strong>
+          <p>Use your Agilent email address as the username and <strong>changeme123</strong> as your password the first time you log in.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <strong>You're in</strong>
+          <p>You'll land on the Guide List — a full list of every guide in the knowledge base. From here you can create, edit, or review any guide.</p>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top: 20px;">
+      <p style="font-size: 13px; color: var(--muted); margin-bottom: 6px;">Admin login page:</p>
+      <a class="url-pill" href="https://app-rgdev2eastus2-saas-clc-kb.azurewebsites.net/admin" target="_blank">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" stroke-width="2" stroke-linecap="round"/></svg>
+        app-rgdev2eastus2-saas-clc-kb.azurewebsites.net/admin
+      </a>
+    </div>
+
+    <div class="tip blue" style="margin-top: 20px;">
+      <div class="tip-icon">🔒</div>
+      <p><strong>Can't remember your password?</strong> Contact your team admin — they can reset it for you from the Members page.</p>
+      <p style="margin-top: 8px;"><strong>Want to change your password?</strong> Once logged in, click your name at the top right → <em>Change Password</em>.</p>
+    </div>
+  </div>
+
+
+  <!-- ── Section 2: Adding a New Guide ───────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <div class="section-title">Adding a New Guide</div>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <strong>Click "New Guide"</strong>
+          <p>You'll find this button at the top of the Guide List page. Click it to open a blank guide.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <strong>Give your guide a title</strong>
+          <p>Pick something clear and descriptive — for example: <em>"How to Reset Your Password"</em> or <em>"Understanding the Insights Dashboard."</em> Users will search for this, so keep it simple.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <strong>Choose a category</strong>
+          <p>Pick the category that best fits the guide — Getting Started, Features, Troubleshooting, etc. This keeps the knowledge base organized.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <strong>Write your content</strong>
+          <p>Type directly into the editor area. See Section 3 for tips on formatting your guide.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <strong>Save and publish</strong>
+          <p>Click <em>Save</em> to store your work at any time. When the guide is ready to go live, change the status from <em>Draft</em> to <em>Published</em> and save again.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="tip green">
+      <div class="tip-icon">✅</div>
+      <p><strong>Published guides appear immediately</strong> on the public knowledge base — no waiting, no IT request needed.</p>
+    </div>
+  </div>
+
+
+  <!-- ── Section 3: Editing in the Editor ────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <div class="section-title">Using the Editor</div>
+    </div>
+
+    <p style="color: var(--muted); margin-bottom: 24px;">The editor works like a simple word processor — just type and format as you go.</p>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="fc-icon">📝</div>
+        <strong>Headings</strong>
+        <p>Use headings to break your guide into sections. Highlight text and pick Heading 1 or Heading 2 from the toolbar.</p>
+      </div>
+      <div class="feature-card">
+        <div class="fc-icon">📋</div>
+        <strong>Bullet Lists</strong>
+        <p>Great for step-by-step instructions. Click the list button in the toolbar or start a line with a dash (-).</p>
+      </div>
+      <div class="feature-card">
+        <div class="fc-icon">🖼️</div>
+        <strong>Images</strong>
+        <p>Paste or upload screenshots directly into the editor. Images appear inline with your text.</p>
+      </div>
+      <div class="feature-card">
+        <div class="fc-icon">📊</div>
+        <strong>Tables</strong>
+        <p>Insert a table from the toolbar to organize information in rows and columns.</p>
+      </div>
+      <div class="feature-card">
+        <div class="fc-icon">💾</div>
+        <strong>Auto-save history</strong>
+        <p>Every time you save, a snapshot is kept. If you make a mistake, you can restore an older version.</p>
+      </div>
+      <div class="feature-card">
+        <div class="fc-icon">👁️</div>
+        <strong>Draft vs Published</strong>
+        <p>Work privately in Draft mode. Flip to Published only when the guide is ready for users to see.</p>
+      </div>
+    </div>
+
+    <div class="tip amber" style="margin-top: 24px;">
+      <div class="tip-icon">💡</div>
+      <p><strong>Quick tip:</strong> Use <strong>Ctrl+Z</strong> (Windows) or <strong>Cmd+Z</strong> (Mac) to undo any change inside the editor, just like in Word or Google Docs.</p>
+    </div>
+  </div>
+
+
+  <!-- ── Section 4: Community ─────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <div class="section-title">Viewing Guides in the Community</div>
+    </div>
+
+    <p style="color: var(--muted); margin-bottom: 24px;">All published guides from the knowledge base are streamed directly into the CrossLab Connect Community. When a guide is updated here, it updates there automatically — no copy-paste, no re-uploading.</p>
+
+    <div class="community-card">
+      <h3>CrossLab Connect Community</h3>
+      <p>Click the link below to open the community page where all guides are embedded and available to the full CrossLab user community.</p>
+      <a class="community-btn" href="https://nextgen-community.agilent.com/technical/crosslab-connect/w/wiki/28042/clc-new-guides" target="_blank">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Open Community Guides
+      </a>
+      <div class="community-url">nextgen-community.agilent.com/technical/crosslab-connect/w/wiki/28042/clc-new-guides</div>
+    </div>
+
+    <div class="tip blue" style="margin-top: 24px;">
+      <div class="tip-icon">🔄</div>
+      <p><strong>Changes are live instantly.</strong> When you publish an update to any guide, it appears in the community page automatically. No action needed on your end.</p>
+    </div>
+  </div>
+
+
+  <!-- ── Footer ────────────────────────────────────────────── -->
+  <div class="footer">
+    <span>CLC Knowledge Base · User Guide · April 2026</span>
+    <span>Agilent CrossLab Connect</span>
+  </div>
+
+</body>
+</html>
