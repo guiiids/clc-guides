@@ -44,7 +44,7 @@ export default function PublicHeader({ guides }) {
     }}>
       {/* Left: Brand */}
       <div style={{ display: 'flex', alignItems: 'center' }}>
-        <img src="/logo.png" alt="Agilent CrossLab Connect" style={{ height: 48, objectFit: 'contain' }} />
+        <img src="/logo.png" alt="Agilent CrossLab Connect" style={{ height: 105, objectFit: 'contain' }} />
       </div>
 
       {/* Center: Search Bar */}
@@ -60,7 +60,7 @@ export default function PublicHeader({ guides }) {
           </div>
           <input
             type="text"
-            placeholder="Search the Knowledge Base (Cmd+K)"
+            placeholder="Search the Knowledge Base (Ctrl+K / Cmd+K)"
             style={{
               display: 'block',
               width: '100%',

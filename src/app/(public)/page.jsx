@@ -118,26 +118,12 @@ export default async function HomePage() {
                     </button>
                   </div>
                 </div>
-                <div style={{ display: 'flex', gap: 12 }}>
-                  <button style={{
-                    padding: '8px 20px', border: '1px solid #2563eb',
-                    color: '#2563eb', fontWeight: 500, borderRadius: 4,
-                    background: 'transparent', cursor: 'pointer', fontSize: 14,
-                    transition: 'background 150ms',
-                  }}>Yes</button>
-                  <button style={{
-                    padding: '8px 20px', border: 'none',
-                    color: '#334155', fontWeight: 500, borderRadius: 4,
-                    background: '#e2e8f0', cursor: 'pointer', fontSize: 14,
-                    transition: 'background 150ms',
-                  }}>No</button>
-                </div>
               </footer>
             </article>
           ))}
         </div>
 
-        {/* Right sidebar - On This Page */}
+        {/* Right sidebar - Resources */}
         <RightSidebar guides={guides} />
       </div>
     </>
