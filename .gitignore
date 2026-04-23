@@ -8,3 +8,5 @@ public/uploads/*
 .DS_Store
 *.bak
 .venv/
+.wolf/
+.claude/

@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation'
 import MembersClient from '@/components/admin/MembersClient'
 
 export const metadata = { title: 'Members — CLC Help Center' }
+export const dynamic = 'force-dynamic'
 
 export default async function MembersPage() {
   const session = await getServerSession(authOptions)
