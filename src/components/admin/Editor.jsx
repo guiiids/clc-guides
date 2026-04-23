@@ -19,7 +19,15 @@ import { createLowlight, common } from 'lowlight'
 import Toolbar from './Toolbar'
 
 // ── Custom image node with selection UI ──────────────────────────────────────
-function ImageNodeView({ node, selected, deleteNode }) {
+const SIZE_PRESETS = [
+  { label: 'S', value: '25%' },
+  { label: 'M', value: '50%' },
+  { label: 'L', value: '75%' },
+  { label: '↔', value: '100%' },
+]
+
+function ImageNodeView({ node, selected, deleteNode, updateAttributes }) {
+  const width = node.attrs.width || '100%'
   return (
     <NodeViewWrapper style={{ display: 'block', position: 'relative', margin: '12px 0' }}>
       <img
@@ -27,6 +35,7 @@ function ImageNodeView({ node, selected, deleteNode }) {
         alt={node.attrs.alt || ''}
         title={node.attrs.title || ''}
         style={{
+          width,
           maxWidth: '100%',
           borderRadius: 6,
           display: 'block',
@@ -38,17 +47,32 @@ function ImageNodeView({ node, selected, deleteNode }) {
       {selected && (
         <div style={{
           position: 'absolute', top: 8, right: 8,
-          display: 'flex', gap: 6,
+          display: 'flex', gap: 4,
         }}>
+          {SIZE_PRESETS.map(p => (
+            <button
+              key={p.value}
+              onMouseDown={e => { e.preventDefault(); updateAttributes({ width: p.value }) }}
+              style={{
+                background: width === p.value ? '#2563eb' : '#fff',
+                color: width === p.value ? '#fff' : '#334155',
+                border: '1px solid #cbd5e1',
+                borderRadius: 5, padding: '2px 8px', fontSize: 11,
+                fontWeight: 600, cursor: 'pointer',
+              }}
+            >
+              {p.label}
+            </button>
+          ))}
           <button
             onMouseDown={e => { e.preventDefault(); deleteNode() }}
             style={{
               background: '#ef4444', color: '#fff', border: 'none',
-              borderRadius: 5, padding: '3px 10px', fontSize: 12,
-              fontWeight: 600, cursor: 'pointer',
+              borderRadius: 5, padding: '2px 8px', fontSize: 11,
+              fontWeight: 600, cursor: 'pointer', marginLeft: 4,
             }}
           >
-            Remove
+            ✕
           </button>
         </div>
       )}
@@ -66,6 +90,11 @@ const CustomImage = Node.create({
       src:   { default: null },
       alt:   { default: null },
       title: { default: null },
+      width: {
+        default: '100%',
+        parseHTML: el => el.style.width || el.getAttribute('width') || '100%',
+        renderHTML: attrs => ({ style: `width:${attrs.width}` }),
+      },
     }
   },
   parseHTML() { return [{ tag: 'img[src]' }] },
